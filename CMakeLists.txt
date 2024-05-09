@@ -22,3 +22,16 @@ set_target_properties(
 file(GLOB_RECURSE SRC_FILES "src/*.cpp" "src/*.hpp")
 
 target_sources(Migrator PRIVATE ${SRC_FILES})
+
+include(FetchContent)
+
+FetchContent_Declare(
+  libpqxx
+  GIT_REPOSITORY https://github.com/jtv/libpqxx.git
+  GIT_TAG 7.9.0
+)
+set(PQXX_LIBRARIES pqxx)
+
+FetchContent_MakeAvailable(libpqxx)
+
+target_link_libraries(Migrator PRIVATE "${PQXX_LIBRARIES}")
