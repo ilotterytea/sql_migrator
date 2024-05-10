@@ -4,6 +4,7 @@
 #include <iostream>
 #include <optional>
 #include <pqxx/pqxx>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -108,7 +109,11 @@ int main(int argc, char *argv[]) {
     }
 
     std::string contents;
-    file >> contents;
+    std::string line;
+
+    while (std::getline(file, line, '\n')) {
+      contents += line;
+    }
 
     try {
       work->exec(contents);
