@@ -16,7 +16,7 @@ add_executable(Migrator)
 set_target_properties(
   Migrator PROPERTIES
   DESCRIPTION ${PROJECT_DESCRIPTION}
-  OUTPUT_NAME "sql_migrator"
+  OUTPUT_NAME "sqlm"
 )
 
 file(GLOB_RECURSE SRC_FILES "src/*.cpp" "src/*.hpp")
