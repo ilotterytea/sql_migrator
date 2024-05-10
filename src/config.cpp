@@ -41,7 +41,7 @@ namespace migrator {
         {"--db-host", c.db_host},
         {"--db-port", c.db_port}};
 
-    for (auto i = args.begin(); i != args.end(); i++) {
+    for (auto i = args.begin(); i != args.end();) {
       std::string key, value;
       key = *i;
 
@@ -63,7 +63,7 @@ namespace migrator {
           return std::nullopt;
         }
 
-        i++;
+        args.erase(i, i + 1);
         continue;
       }
 
@@ -71,6 +71,7 @@ namespace migrator {
                                [&](const auto &x) { return x.first == key; });
 
       if (pair == map.end()) {
+        i++;
         continue;
       }
 
@@ -83,7 +84,7 @@ namespace migrator {
 
       pair->second = value;
 
-      i++;
+      args.erase(i, i + 2);
     }
 
     return c;
