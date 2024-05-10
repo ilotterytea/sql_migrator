@@ -18,4 +18,6 @@ namespace migrator {
       std::vector<std::string> &args);
   bool update_configuration_from_file(const std::string &path,
                                       Configuration &c);
+
+  void show_more_info();
 }

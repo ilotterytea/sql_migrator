@@ -48,7 +48,7 @@ namespace migrator {
       key = *i;
 
       if (key == "--help" || key == "-h") {
-        std::cout << "more info\n";
+        show_more_info();
         return std::nullopt;
       }
 
@@ -126,5 +126,46 @@ namespace migrator {
     }
 
     return true;
+  }
+
+  void show_more_info() {
+    std::cout
+        << "Usage: sqlm [COMMAND] [OPTION]...\n"
+        << "Making it easier to run all SQL queries from a folder.\n"
+        << "Rollback and creation of new queries is also possible!\n"
+        << "\n!!! SUPPORTS POSTGRESQL ONLY !!!\n"
+        << "\nAVAILABLE COMMANDS\n"
+        << "  run                Run all queries from the migration folder.\n"
+        << "                     It will only run queries from 'up.sql' "
+           "files.\n"
+        << "  revert             Revert all queries from the migration "
+           "folder.\n"
+        << "                     It will only run queries from 'down.sql' "
+           "files.\n"
+        << "  generate NAME      Generate a new migration.\n"
+        << "\nAVAILABLE OPTIONS\n"
+        << "  -c, --config       Set the path to the configuration file.\n"
+        << "                     The configuration file must be in "
+           "the format KEY=VALUE.\n"
+        << "                     Default value: .env\n"
+        << "  --migration-dir    Set the path to the directory from\n"
+        << "                     where all migrations will be loaded.\n"
+        << "                     Default value: migrations\n"
+        << "  --db-name          Database name. Required!\n"
+        << "  --db-user          Database user. Required!\n"
+        << "  --db-pass          Database password. Required!\n"
+        << "  --db-host          Database host.\n"
+        << "                     Default value: localhost\n"
+        << "  --db-port          Database port.\n"
+        << "                     Default value: 5432\n"
+        << "\nEXAMPLES\n"
+        << "  sqlm run --db-name forsen --db-user poggers --db-pass pagman\n"
+        << "  sqlm generate a_new_migration\n"
+        << "  sqlm revert -c migrator.ini\n"
+        << "\nCONFIGURATION FILE EXAMPLE\n"
+        << "  db_name=forsen\n"
+        << "  db_user=poggers\n"
+        << "  db_pass=pagman\n"
+        << "  migration_dir=sql/migrations\n";
   }
 }
