@@ -11,7 +11,7 @@ namespace migrator {
       std::string db_host = "localhost", db_port = "5432";
   };
 
-  enum Mode { RUN, REVERT };
+  enum Mode { RUN, REVERT, GENERATE };
 
   std::optional<Mode> parse_mode(const std::vector<std::string> &args);
   std::optional<Configuration> parse_configuration_from_cli(

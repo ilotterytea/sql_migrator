@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "config.hpp"
+#include "generator.hpp"
 
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
@@ -52,6 +53,11 @@ int main(int argc, char *argv[]) {
   if (!directory_exists) {
     std::cout << "Creating the \"" << folder_path << "\" directory...\n";
     std::filesystem::create_directories(folder_path);
+  }
+
+  if (*mode == migrator::Mode::GENERATE) {
+    migrator::generate_migration_folder(*configuration, args);
+    return 0;
   }
 
   // validating directories

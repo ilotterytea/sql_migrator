@@ -23,6 +23,8 @@ namespace migrator {
       return Mode::RUN;
     } else if (arg == "revert") {
       return Mode::REVERT;
+    } else if (arg == "generate" && args.size() > 1) {
+      return Mode::GENERATE;
     }
 
     return std::nullopt;
