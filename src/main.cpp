@@ -12,6 +12,13 @@
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
 
+  std::optional<migrator::Configuration> configuration =
+      migrator::parse_configuration_from_cli(argc, argv);
+
+  if (!configuration.has_value()) {
+    return 1;
+  }
+
   std::optional<migrator::Mode> mode = migrator::parse_mode(argc, argv);
 
   if (!mode.has_value()) {
@@ -20,7 +27,16 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  std::string folder_path = "migrations";
+  if (configuration->db_name.empty() || configuration->db_user.empty() ||
+      configuration->db_pass.empty() || configuration->db_host.empty() ||
+      configuration->db_port.empty()) {
+    std::cerr << "Database credentials must be set!\n"
+              << "Run with -h or --help argument to get more information\n";
+
+    return 1;
+  }
+
+  const std::string &folder_path = configuration->migration_dir;
 
   bool directory_exists = std::filesystem::exists(folder_path);
   bool is_directory = std::filesystem::is_directory(folder_path);
@@ -56,7 +72,11 @@ int main(int argc, char *argv[]) {
   // running migrations
   bool up = *mode == migrator::Mode::RUN;
 
-  std::string conn_url;
+  std::string conn_url = "dbname = " + configuration->db_name +
+                         " user = " + configuration->db_user +
+                         " password = " + configuration->db_pass +
+                         " host = " + configuration->db_host +
+                         " port = " + configuration->db_port;
 
   pqxx::connection conn(conn_url);
   pqxx::work *work = new pqxx::work(conn);
