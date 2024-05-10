@@ -7,16 +7,17 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace migrator {
-  std::optional<Mode> parse_mode(int argc, char *argv[]) {
-    if (argc == 1) {
+  std::optional<Mode> parse_mode(const std::vector<std::string> &args) {
+    if (args.empty()) {
       return std::nullopt;
     }
 
     // it could be done with usual char * i guess
     // im retard btw
-    std::string arg = argv[1];
+    std::string arg = args[0];
 
     if (arg == "run") {
       return Mode::RUN;
@@ -27,8 +28,8 @@ namespace migrator {
     return std::nullopt;
   }
 
-  std::optional<Configuration> parse_configuration_from_cli(int argc,
-                                                            char *argv[]) {
+  std::optional<Configuration> parse_configuration_from_cli(
+      std::vector<std::string> &args) {
     Configuration c;
     update_configuration_from_file(".env", c);
 
@@ -40,9 +41,9 @@ namespace migrator {
         {"--db-host", c.db_host},
         {"--db-port", c.db_port}};
 
-    for (int i = 1; i < argc; i++) {
+    for (auto i = args.begin(); i != args.end(); i++) {
       std::string key, value;
-      key = argv[i];
+      key = *i;
 
       if (key == "--help" || key == "-h") {
         std::cout << "more info\n";
@@ -50,12 +51,12 @@ namespace migrator {
       }
 
       if (key == "--config" || key == "-c") {
-        if (i + 1 >= argc) {
+        if (i + 1 >= args.end()) {
           std::cerr << "Argument " << key << " requires a value!\n";
           return std::nullopt;
         }
 
-        value = argv[i + 1];
+        value = *(i + 1);
 
         if (!update_configuration_from_file(value, c)) {
           std::cerr << "Failed to open configuration file at " << value << "\n";
@@ -73,12 +74,12 @@ namespace migrator {
         continue;
       }
 
-      if (i + 1 >= argc) {
+      if (i + 1 >= args.end()) {
         std::cerr << "Argument " << key << " requires a value!\n";
         return std::nullopt;
       }
 
-      value = argv[i + 1];
+      value = *(i + 1);
 
       pair->second = value;
 

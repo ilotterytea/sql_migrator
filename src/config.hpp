@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace migrator {
   struct Configuration {
@@ -12,9 +13,9 @@ namespace migrator {
 
   enum Mode { RUN, REVERT };
 
-  std::optional<Mode> parse_mode(int argc, char *argv[]);
-  std::optional<Configuration> parse_configuration_from_cli(int argc,
-                                                            char *argv[]);
+  std::optional<Mode> parse_mode(const std::vector<std::string> &args);
+  std::optional<Configuration> parse_configuration_from_cli(
+      std::vector<std::string> &args);
   bool update_configuration_from_file(const std::string &path,
                                       Configuration &c);
 }

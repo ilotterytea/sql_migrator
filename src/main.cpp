@@ -4,7 +4,6 @@
 #include <iostream>
 #include <optional>
 #include <pqxx/pqxx>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -13,14 +12,16 @@
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
 
+  std::vector<std::string> args(argv + 1, argv + argc);
+
   std::optional<migrator::Configuration> configuration =
-      migrator::parse_configuration_from_cli(argc, argv);
+      migrator::parse_configuration_from_cli(args);
 
   if (!configuration.has_value()) {
     return 1;
   }
 
-  std::optional<migrator::Mode> mode = migrator::parse_mode(argc, argv);
+  std::optional<migrator::Mode> mode = migrator::parse_mode(args);
 
   if (!mode.has_value()) {
     std::cerr << "Missing the mode argument!\n"
