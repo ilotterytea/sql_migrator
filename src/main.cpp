@@ -109,6 +109,10 @@ int main(int argc, char *argv[]) {
     migration_names.push_back(row[0].as<std::string>());
   }
 
+  if (!up) {
+    std::reverse(valid_directory_paths.begin(), valid_directory_paths.end());
+  }
+
   for (const std::string &path : valid_directory_paths) {
     auto path_s = migrator::utils::split_text(path, '/');
     auto name_s = migrator::utils::split_text(path_s[path_s.size() - 1], '_');
@@ -151,9 +155,10 @@ int main(int argc, char *argv[]) {
     std::string line;
 
     while (std::getline(file, line, '\n')) {
-      contents += line;
+      contents += line + '\n';
     }
-
+    delete work;
+    work = new pqxx::work(conn);
     try {
       work->exec(contents);
       work->commit();
@@ -161,6 +166,20 @@ int main(int argc, char *argv[]) {
       std::cout << ex.what() << "\n";
     }
 
+    delete work;
+    work = new pqxx::work(conn);
+
+    if (name != "0000000000000000000") {
+      if (up) {
+        work->exec("INSERT INTO \"__sqlm_migrations\"(\"id\") VALUES ('" +
+                   name + "')");
+        work->commit();
+      } else {
+        work->exec("DELETE FROM \"__sqlm_migrations\" WHERE id = '" + name +
+                   "'");
+        work->commit();
+      }
+    }
     delete work;
     work = new pqxx::work(conn);
   }
