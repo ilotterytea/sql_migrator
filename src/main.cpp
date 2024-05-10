@@ -9,6 +9,7 @@
 
 #include "config.hpp"
 #include "generator.hpp"
+#include "init.hpp"
 
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
@@ -59,6 +60,8 @@ int main(int argc, char *argv[]) {
     migrator::generate_migration_folder(*configuration, args);
     return 0;
   }
+
+  migrator::create_sqlm_table_migration(*configuration);
 
   // validating directories
   std::vector<std::string> valid_directory_paths;
