@@ -14,8 +14,6 @@
 #include "util.hpp"
 
 int main(int argc, char *argv[]) {
-  std::cout << "hi!" << std::endl;
-
   std::vector<std::string> args(argv + 1, argv + argc);
 
   std::optional<migrator::Configuration> configuration =
@@ -113,6 +111,8 @@ int main(int argc, char *argv[]) {
     std::reverse(valid_directory_paths.begin(), valid_directory_paths.end());
   }
 
+  int done = 0;
+
   for (const std::string &path : valid_directory_paths) {
     auto path_s = migrator::utils::split_text(path, '/');
     auto name_s = migrator::utils::split_text(path_s[path_s.size() - 1], '_');
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 
     if (!file.is_open()) {
       std::cout << "Failed to open the \"" << file_path << "\" file!\n";
-      continue;
+      return 1;
     }
 
     std::string contents;
@@ -163,7 +163,8 @@ int main(int argc, char *argv[]) {
       work->exec(contents);
       work->commit();
     } catch (std::exception &ex) {
-      std::cout << ex.what() << "\n";
+      std::cerr << ex.what() << "\n";
+      return 1;
     }
 
     delete work;
@@ -182,12 +183,18 @@ int main(int argc, char *argv[]) {
     }
     delete work;
     work = new pqxx::work(conn);
+
+    done++;
   }
 
   delete work;
   conn.close();
 
-  std::cout << "Done!\n";
+  if (done > 0) {
+    std::cout << "Done. Have a nice day.\n";
+  } else {
+    std::cout << "Nothing changed.\n";
+  }
 
   return 0;
 }
