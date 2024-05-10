@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -10,6 +11,7 @@
 #include "config.hpp"
 #include "generator.hpp"
 #include "init.hpp"
+#include "util.hpp"
 
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
@@ -92,7 +94,34 @@ int main(int argc, char *argv[]) {
   pqxx::connection conn(conn_url);
   pqxx::work *work = new pqxx::work(conn);
 
+  pqxx::result query;
+
+  //  after we can revert the main sqlm table, we need to wrap this in a
+  //  try-catch block
+  try {
+    query = work->exec("SELECT id FROM __sqlm_migrations");
+  } catch (std::exception e) {
+  }
+
+  std::vector<std::string> migration_names;
+
+  for (const auto &row : query) {
+    migration_names.push_back(row[0].as<std::string>());
+  }
+
   for (const std::string &path : valid_directory_paths) {
+    auto path_s = migrator::utils::split_text(path, '/');
+    auto name_s = migrator::utils::split_text(path_s[path_s.size() - 1], '_');
+    std::string name = name_s[0];
+
+    bool already_migrated =
+        std::any_of(migration_names.begin(), migration_names.end(),
+                    [&](const auto &x) { return x == name; });
+
+    if ((up && already_migrated) || (!up && !already_migrated)) {
+      continue;
+    }
+
     std::string action;
 
     if (up) {
