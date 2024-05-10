@@ -2,12 +2,23 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <pqxx/pqxx>
 #include <string>
 #include <vector>
 
+#include "config.hpp"
+
 int main(int argc, char *argv[]) {
   std::cout << "hi!" << std::endl;
+
+  std::optional<migrator::Mode> mode = migrator::parse_mode(argc, argv);
+
+  if (!mode.has_value()) {
+    std::cerr << "Missing the mode argument!\n"
+              << "Run with -h or --help argument to get more information\n";
+    return 1;
+  }
 
   std::string folder_path = "migrations";
 
@@ -43,7 +54,7 @@ int main(int argc, char *argv[]) {
   }
 
   // running migrations
-  bool up = true;
+  bool up = *mode == migrator::Mode::RUN;
 
   std::string conn_url;
 
@@ -51,7 +62,15 @@ int main(int argc, char *argv[]) {
   pqxx::work *work = new pqxx::work(conn);
 
   for (const std::string &path : valid_directory_paths) {
-    std::cout << "Running the \"" << path << "\" migration...\n";
+    std::string action;
+
+    if (up) {
+      action = "Running";
+    } else {
+      action = "Reverting";
+    }
+
+    std::cout << action << " the \"" << path << "\" migration...\n";
 
     std::string file_path;
 
