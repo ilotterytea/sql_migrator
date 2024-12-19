@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     migration_names.push_back(row[0].as<std::string>());
   }
 
-  if (!up) {
+  if (up) {
     std::reverse(valid_directory_paths.begin(), valid_directory_paths.end());
   }
 
